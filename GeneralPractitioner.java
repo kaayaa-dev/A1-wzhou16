@@ -1,34 +1,51 @@
 /**
  * Represents a health professional of type General Practitioner.
- * The caller checks the common staff details and provides a nonblank clinic
- * when using the constructor with a custom value.
+ * The creation methods check the common staff details and the clinic name.
  */
 public final class GeneralPractitioner extends HealthProfessional implements Prescribable {
     private static final String DEFAULT_CLINIC_NAME = "Community Clinic";
     private final String clinicName;
 
     /**
-     * Initializes a professional with the default clinic.
+     * Stores the validated staff details and clinic name.
      *
      * @param id a positive professional ID
      * @param name a nonblank professional name
      * @param workingDays a nonempty array of distinct full day names, Monday to Sunday
+     * @param clinicName a nonblank clinic name
      */
-    public GeneralPractitioner(int id, String name, String[] workingDays) {
-        this(id, name, workingDays, DEFAULT_CLINIC_NAME);
+    private GeneralPractitioner(int id, String name, String[] workingDays, String clinicName) {
+        super(id, name, workingDays);
+        this.clinicName = clinicName.trim();
     }
 
     /**
-     * Initializes a professional with a nonblank clinic supplied by the caller.
+     * Creates a professional with the default clinic name.
      *
      * @param id a positive professional ID
      * @param name a nonblank professional name
      * @param workingDays a nonempty array of distinct full day names, Monday to Sunday
-     * @param clinicName a nonblank clinic
+     * @return the new professional, or null if the staff details are invalid
      */
-    public GeneralPractitioner(int id, String name, String[] workingDays, String clinicName) {
-        super(id, name, workingDays);
-        this.clinicName = clinicName.trim();
+    public static GeneralPractitioner create(int id, String name, String[] workingDays) {
+        return create(id, name, workingDays, DEFAULT_CLINIC_NAME);
+    }
+
+    /**
+     * Creates a professional with a custom clinic name after checking the details.
+     *
+     * @param id a positive professional ID
+     * @param name a nonblank professional name
+     * @param workingDays a nonempty array of distinct full day names, Monday to Sunday
+     * @param clinicName a nonblank clinic name
+     * @return the new professional, or null if the staff details or clinic name are invalid
+     */
+    public static GeneralPractitioner create(int id, String name, String[] workingDays,
+            String clinicName) {
+        if (!validDetails(id, name, workingDays) || !hasText(clinicName)) {
+            return null;
+        }
+        return new GeneralPractitioner(id, name, workingDays, clinicName);
     }
 
     /**

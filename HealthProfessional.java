@@ -1,7 +1,7 @@
 /**
  * Stores the identity, name and working days shared by health professionals.
- * The caller checks new staff details with {@link #validDetails(int, String, String[])}
- * before construction. This class keeps its own copy of the schedule.
+ * Subclass creation methods use this class to validate the common staff details.
+ * The constructor stores those details and keeps its own copy of the schedule.
  */
 public abstract class HealthProfessional {
     private static final String[] DAY_NAMES = {
@@ -13,14 +13,13 @@ public abstract class HealthProfessional {
     private final String[] workingDays;
 
     /**
-     * Initializes the common fields and stores a copy of the working days.
-     * The caller must supply a positive ID, a nonblank name and valid distinct day names.
+     * Initializes the validated common fields and stores a copy of the working days.
      *
      * @param id the positive professional ID
      * @param name the nonblank name
      * @param workingDays a nonempty array of distinct full English day names, Monday to Sunday
      */
-    public HealthProfessional(int id, String name, String[] workingDays) {
+    protected HealthProfessional(int id, String name, String[] workingDays) {
         this.id = id;
         this.name = name.trim();
         // Keep our own schedule in case the caller edits the input array later.
