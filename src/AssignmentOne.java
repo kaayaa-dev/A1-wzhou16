@@ -191,11 +191,11 @@ public class AssignmentOne {
         printHeading("All appointments in booking order");
         printAppointments(manager.getAllAppointments());
         printHeading("All appointments sorted by time");
-        printAppointments(manager.sortAppointments(manager.getAllAppointments()));
+        printSortedAppointments(manager.sortAppointments(manager.getAllAppointments()));
         ArrayList<Appointment> gpBookings = printProfessionalFilter(manager, gpAlex.getId());
         if (gpBookings != null) {
             printHeading("Professional's filtered appointments sorted by time");
-            printAppointments(manager.sortAppointments(gpBookings));
+            printSortedAppointments(manager.sortAppointments(gpBookings));
         }
 
         printHeading("Filter input and empty results");
@@ -207,19 +207,7 @@ public class AssignmentOne {
         demonstrateRescheduling(manager, liamBooking, professionals, gpAlex, noahTime);
         demonstrateSelectedCancellations(mia, nurse);
 
-        printHeading("Cancel all of Noah's appointments by phone");
-        String noahPhone = noah.getPhone();
-        ArrayList<Appointment> noahBookings = manager.sortAppointments(manager.filterByPhone(noahPhone).getMatches());
-        System.out.println("Noah reviews " + noahBookings.size() + " bookings before confirming.");
-        printAppointments(noahBookings);
-        boolean confirmAll = true;
-        if (confirmAll && !noahBookings.isEmpty()) {
-            System.out.println("Noah confirms cancellation of all listed bookings.");
-            System.out.println(manager.cancelAppointmentsByPhone(noahPhone));
-        }
-        printPhoneFilter(manager, noahPhone);
-        printHeading("Noah's cancelled bookings");
-        printAppointments(manager.sortAppointments(manager.filterCancelledByPhone(noahPhone).getMatches()));
+        manageNoahCancellation(manager, noah);
 
         AppointmentManager conflictManager = new AppointmentManager(manager.getBookingDay());
         HealthProfessional sameAlex = GeneralPractitioner.create(gpAlex.getId(),
@@ -242,8 +230,12 @@ public class AssignmentOne {
         // Expected: 16:30 is rejected because it is after closing.
         printBookingRequest(manager, ava, gpAlex, "16:30");
         printHeading("Time outside the 30-minute slot grid");
-        // Expected: 08:15 is within clinic hours but falls between slots.
-        printBookingRequest(manager, ava, gpAlex, "08:15");
+        // Expected: the draft accepts 08:15, then the manager rejects it as off the slot grid.
+        Appointment draft = Appointment.create(ava, gpAlex, "08:00");
+        if (draft != null) {
+            draft.setTime("08:15");
+            printBookingRequest(manager, draft.getPatient(), draft.getProfessional(), draft.getTime());
+        }
 
         printHeading("Time format and clock range");
         // Expected: 8:00 fails the HH:mm format check.
@@ -439,8 +431,13 @@ public class AssignmentOne {
             Appointment cardiologyBooking, ArrayList<HealthProfessional> professionals, Patient nextPatient) {
         printHeading("Ava reviews and selects a booking to cancel");
         String phone = patient.getPhone();
-        ArrayList<Appointment> bookings = manager.sortAppointments(
+        SortResult sorted = manager.sortAppointments(
                 manager.filterByPhone(phone).getMatches());
+        if (sorted.getWarning() != null) {
+            System.out.println(sorted.getWarning());
+            return;
+        }
+        ArrayList<Appointment> bookings = sorted.getAppointments();
         printAppointments(bookings);
         if (cardiologyBooking == null) {
             return;
@@ -462,6 +459,33 @@ public class AssignmentOne {
         cancelSelected(manager, selectedAppointment);
 
         demonstrateRebooking(manager, selectedAppointment, professionals, nextPatient);
+    }
+
+    /**
+     * Shows Noah's bookings before cancelling them by phone and displaying his history.
+     *
+     * @param manager the booking list for the simulated day
+     * @param noah the patient whose bookings are being reviewed
+     */
+    private static void manageNoahCancellation(AppointmentManager manager, Patient noah) {
+        printHeading("Cancel all of Noah's appointments by phone");
+        String phone = noah.getPhone();
+        SortResult sorted = manager.sortAppointments(manager.filterByPhone(phone).getMatches());
+        if (sorted.getWarning() != null) {
+            System.out.println(sorted.getWarning());
+            return;
+        }
+        ArrayList<Appointment> bookings = sorted.getAppointments();
+        System.out.println("Noah reviews " + bookings.size() + " bookings before confirming.");
+        printAppointments(bookings);
+        boolean confirmAll = true;
+        if (confirmAll && !bookings.isEmpty()) {
+            System.out.println("Noah confirms cancellation of all listed bookings.");
+            System.out.println(manager.cancelAppointmentsByPhone(phone));
+        }
+        printPhoneFilter(manager, phone);
+        printHeading("Noah's cancelled bookings");
+        printSortedAppointments(manager.sortAppointments(manager.filterCancelledByPhone(phone).getMatches()));
     }
 
     /**
@@ -704,6 +728,19 @@ public class AssignmentOne {
         System.out.println("Available slots for " + professional.getName() + " on "
                 + manager.getBookingDay() + ": " + availableSlots);
         return availableSlots;
+    }
+
+    /**
+     * Shows a sorting warning or prints the appointments in the result.
+     *
+     * @param result the outcome of sorting the appointments
+     */
+    private static void printSortedAppointments(SortResult result) {
+        if (result.getWarning() != null) {
+            System.out.println(result.getWarning());
+        } else {
+            printAppointments(result.getAppointments());
+        }
     }
 
     /**

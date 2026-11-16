@@ -4,7 +4,7 @@
  */
 public final class GeneralPractitioner extends HealthProfessional implements Prescribable {
     private static final String DEFAULT_CLINIC_NAME = "Community Clinic";
-    private final String clinicName;
+    private String clinicName;
 
     /**
      * Stores the validated staff details and clinic name.
@@ -48,20 +48,20 @@ public final class GeneralPractitioner extends HealthProfessional implements Pre
         return new GeneralPractitioner(id, name, workingDays, clinicName);
     }
 
-    /**
-     * Gets the clinic.
-     *
-     * @return the clinic
-     */
+    // Returns the current clinic name.
     public String getClinicName() {
         return clinicName;
     }
 
-    /**
-     * Gets the professional type.
-     *
-     * @return the type to display
-     */
+    // Updates the clinic name after trimming leading and trailing spaces.
+    // Keeps the current value if the new value is null, empty, or only spaces.
+    public void setClinicName(String clinicName) {
+        if (hasText(clinicName)) {
+            this.clinicName = clinicName.trim();
+        }
+    }
+
+    // Returns "General Practitioner" as the professional type.
     @Override
     public String getProfessionalType() {
         return "General Practitioner";

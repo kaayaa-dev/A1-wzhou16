@@ -4,7 +4,7 @@
  */
 public final class Specialist extends HealthProfessional implements Prescribable {
     private static final String DEFAULT_SPECIALTY = "General Medicine";
-    private final String specialty;
+    private String specialty;
 
     /**
      * Stores the validated staff details and specialty.
@@ -48,20 +48,20 @@ public final class Specialist extends HealthProfessional implements Prescribable
         return new Specialist(id, name, workingDays, specialty);
     }
 
-    /**
-     * Gets the specialty.
-     *
-     * @return the specialty
-     */
+    // Returns the specialist's current specialty.
     public String getSpecialty() {
         return specialty;
     }
 
-    /**
-     * Gets the professional type.
-     *
-     * @return the type to display
-     */
+    // Updates the specialist's specialty after trimming leading and trailing spaces.
+    // Keeps the current value if the new value is null, empty, or only spaces.
+    public void setSpecialty(String specialty) {
+        if (hasText(specialty)) {
+            this.specialty = specialty.trim();
+        }
+    }
+
+    // Returns "Specialist" as the professional type.
     @Override
     public String getProfessionalType() {
         return "Specialist";

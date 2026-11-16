@@ -4,7 +4,7 @@
  */
 public final class Physiotherapist extends HealthProfessional {
     private static final String DEFAULT_FOCUS_AREA = "General Rehabilitation";
-    private final String focusArea;
+    private String focusArea;
 
     /**
      * Stores the validated staff details and focus area.
@@ -48,20 +48,20 @@ public final class Physiotherapist extends HealthProfessional {
         return new Physiotherapist(id, name, workingDays, focusArea);
     }
 
-    /**
-     * Gets the focus area.
-     *
-     * @return the focus area
-     */
+    // Returns the physiotherapist's current focus area.
     public String getFocusArea() {
         return focusArea;
     }
 
-    /**
-     * Gets the professional type.
-     *
-     * @return the type to display
-     */
+    // Updates the physiotherapist's focus area after trimming leading and trailing spaces.
+    // Keeps the current value if the new value is null, empty, or only spaces.
+    public void setFocusArea(String focusArea) {
+        if (hasText(focusArea)) {
+            this.focusArea = focusArea.trim();
+        }
+    }
+
+    // Returns "Physiotherapist" as the professional type.
     @Override
     public String getProfessionalType() {
         return "Physiotherapist";

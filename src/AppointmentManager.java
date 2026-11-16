@@ -29,22 +29,13 @@ public final class AppointmentManager {
         cancelledAppointments = new ArrayList<>();
     }
 
-    /**
-     * Gives the day represented by this booking list.
-     *
-     * @return the booking day's name
-     */
+    // Returns the day used for this booking list.
     public String getBookingDay() {
         return bookingDay;
     }
 
-    /**
-     * Finds the start times still available for one professional on the booking day.
-     * This query leaves the appointment records as they are.
-     *
-     * @param professional the health professional whose schedule to check
-     * @return a new list in time order, empty for invalid input, a day off or a full schedule
-     */
+    // Returns a new list of the professional's available times for the booking day, earliest first.
+    // Returns an empty list for invalid input, a day off, or a fully booked day.
     public ArrayList<String> getAvailableSlots(HealthProfessional professional) {
         ArrayList<String> availableSlots = new ArrayList<>();
         if (!validBookingDay || professional == null || !professional.worksOn(bookingDay)) {
@@ -122,7 +113,7 @@ public final class AppointmentManager {
         if (error != null) {
             return new BookingResult("Booking rejected: " + error, null);
         }
-        Appointment appointment = Appointment.create(patient, professional, time);
+        Appointment appointment = Appointment.createConfirmed(patient, professional, time);
         if (appointment == null) {
             return new BookingResult("Booking rejected: unable to create the appointment.", null);
         }
@@ -212,7 +203,7 @@ public final class AppointmentManager {
         if (error != null) {
             return "Reschedule warning: " + error;
         }
-        Appointment replacement = Appointment.create(patient, newProfessional, newTime);
+        Appointment replacement = Appointment.createConfirmed(patient, newProfessional, newTime);
         if (replacement == null) {
             return "Reschedule warning: unable to create the replacement appointment.";
         }
@@ -221,11 +212,8 @@ public final class AppointmentManager {
                 + " to " + newTime + " with professional " + newProfessional.getId() + ".";
     }
 
-    /**
-     * Gets the bookings in their current insertion order.
-     *
-     * @return a new list of all bookings
-     */
+    // Returns a new list of confirmed bookings in the order they were added.
+    // The bookings in the list have locked times.
     public ArrayList<Appointment> getAllAppointments() {
         return new ArrayList<>(appointments);
     }
@@ -294,10 +282,17 @@ public final class AppointmentManager {
      * Sorts a copy of the supplied bookings from earliest to latest.
      * Bookings at the same time keep their relative order.
      *
-     * @param source a non-null list containing only non-null appointments
-     * @return a new list in time order, with equal times in their original order
+     * @param source the list of appointments to sort
+     * @return a sorted copy or an empty list with a warning if the input has a null list or entry
      */
-    public ArrayList<Appointment> sortAppointments(ArrayList<Appointment> source) {
+    public SortResult sortAppointments(ArrayList<Appointment> source) {
+        if (source == null) {
+            return new SortResult(new ArrayList<>(), "Sorting warning: the appointment list is missing.");
+        }
+        if (source.contains(null)) {
+            return new SortResult(new ArrayList<>(), "Sorting warning: the list contains a missing appointment.");
+        }
+
         ArrayList<Appointment> sorted = new ArrayList<>(source);
         for (int index = 1; index < sorted.size(); index++) {
             Appointment current = sorted.get(index);
@@ -309,7 +304,7 @@ public final class AppointmentManager {
             }
             sorted.set(position, current);
         }
-        return sorted;
+        return new SortResult(sorted, null);
     }
 
     /**

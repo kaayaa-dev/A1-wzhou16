@@ -19,20 +19,12 @@ public final class FilterResult {
         this.warning = warning;
     }
 
-    /**
-     * Gets the result's list, which is independent of the manager's booking list.
-     *
-     * @return the matching appointments
-     */
+    // Returns the matching appointments in the filter result's own list.
     public ArrayList<Appointment> getMatches() {
         return matches;
     }
 
-    /**
-     * Gets the reason for rejecting an invalid query.
-     *
-     * @return the warning, or null for a valid query
-     */
+    // Returns the warning for an invalid query, or null if the query was valid.
     public String getWarning() {
         return warning;
     }

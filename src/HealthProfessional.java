@@ -9,7 +9,7 @@ public abstract class HealthProfessional {
     };
 
     private final int id;
-    private final String name;
+    private String name;
     private final String[] workingDays;
 
     /**
@@ -92,29 +92,25 @@ public abstract class HealthProfessional {
         return copy;
     }
 
-    /**
-     * Gets the professional ID.
-     *
-     * @return the ID
-     */
+    // Returns the professional's ID.
     public int getId() {
         return id;
     }
 
-    /**
-     * Gets the professional's name.
-     *
-     * @return the name
-     */
+    // Returns the health professional's current name.
     public String getName() {
         return name;
     }
 
-    /**
-     * Gets the working days.
-     *
-     * @return an independent copy of the working days
-     */
+    // Updates the health professional's name after trimming leading and trailing spaces.
+    // Keeps the current value if the new value is null, empty, or only spaces.
+    public void setName(String name) {
+        if (hasText(name)) {
+            this.name = name.trim();
+        }
+    }
+
+    // Returns a copy of the professional's working days.
     public String[] getWorkingDays() {
         // Returning the stored array would let a caller change the days used by worksOn.
         return copyDays(workingDays);
@@ -135,11 +131,7 @@ public abstract class HealthProfessional {
         return false;
     }
 
-    /**
-     * Gives the type of health professional.
-     *
-     * @return the type to display
-     */
+    // Returns the professional type to display.
     public abstract String getProfessionalType();
 
     /**

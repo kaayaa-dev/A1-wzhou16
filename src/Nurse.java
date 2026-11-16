@@ -4,7 +4,7 @@
  */
 public final class Nurse extends HealthProfessional {
     private static final String DEFAULT_DEPARTMENT = "Outpatient Care";
-    private final String department;
+    private String department;
 
     /**
      * Stores the validated staff details and department.
@@ -48,20 +48,20 @@ public final class Nurse extends HealthProfessional {
         return new Nurse(id, name, workingDays, department);
     }
 
-    /**
-     * Gets the department.
-     *
-     * @return the department
-     */
+    // Returns the nurse's current department.
     public String getDepartment() {
         return department;
     }
 
-    /**
-     * Gets the professional type.
-     *
-     * @return the type to display
-     */
+    // Updates the nurse's department after trimming leading and trailing spaces.
+    // Keeps the current value if the new value is null, empty, or only spaces.
+    public void setDepartment(String department) {
+        if (hasText(department)) {
+            this.department = department.trim();
+        }
+    }
+
+    // Returns "Nurse" as the professional type.
     @Override
     public String getProfessionalType() {
         return "Nurse";

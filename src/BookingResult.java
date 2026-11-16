@@ -16,12 +16,12 @@ final class BookingResult {
         this.appointment = appointment;
     }
 
-    /** @return the confirmation or rejection message */
+    // Returns the confirmation or rejection message for this request.
     String getMessage() {
         return message;
     }
 
-    /** @return the appointment added by this request, or null if rejected */
+    // Returns the appointment added by this request, or null if it was rejected.
     Appointment getAppointment() {
         return appointment;
     }

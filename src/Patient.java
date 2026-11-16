@@ -6,7 +6,7 @@
 public final class Patient {
     private static final int PHONE_LENGTH = 10;
 
-    private final String name;
+    private String name;
     private final String phone;
 
     /**
@@ -40,20 +40,20 @@ public final class Patient {
         return true;
     }
 
-    /**
-     * Gets the patient name.
-     *
-     * @return the name
-     */
+    // Returns the patient's current name.
     public String getName() {
         return name;
     }
 
-    /**
-     * Gets the phone number, including any leading zero.
-     *
-     * @return the phone number
-     */
+    // Updates the patient's name after trimming leading and trailing spaces.
+    // Keeps the current value if the new value is null, empty, or only spaces.
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name.trim();
+        }
+    }
+
+    // Returns the patient's phone number, including any leading zero.
     public String getPhone() {
         return phone;
     }
